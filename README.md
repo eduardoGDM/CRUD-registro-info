@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+Projeto realizado com auxilio de React.Js.Utilizando axios juntamente com o aplicação web Replit para o uso da API desenvolvida.
+API:
+var pessoas = [
+  { "id": 1, "nome": "Luiz", "email": "luiz@gmail.com" },
+  { "id": 2, "nome": "Fernando", "email": "Fernando@gmail.com" },
+  { "id": 3, "nome": "Joao", "email": "joao@gmail.com" },
+  { "id": 4, "nome": "Mario", "email": "mario@gmail.com" }
+];
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+var http = require('http');
 
-## Available Scripts
+var server = http.createServer(function(request, response) {
+  // Configurando os cabeçalhos CORS
+  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.setHeader('Access-Control-Max-Age', '86400'); // 24 horas
 
-In the project directory, you can run:
+  if (request.method === 'OPTIONS') {
+    // Responde diretamente para requisições OPTIONS
+    response.writeHead(200);
+    response.end();
+  } else if (request.method === 'POST') {
+    // Recebe dados via POST e atualiza a variável "pessoas"
+    var requestBody = '';
+    request.on('data', function(data) {
+      requestBody += data;
+    });
+    request.on('end', function() {
+      // Aqui você pode processar o requestBody como desejar
+      var newPerson = JSON.parse(requestBody);
+      newPerson.id = pessoas.length + 1;
+      pessoas.push(newPerson);
 
-### `npm start`
+      // Responde com a lista atualizada de pessoas
+      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.write(JSON.stringify(pessoas));
+      response.end();
+    });
+  } else if (request.method === 'DELETE') {
+    // Recebe o ID da pessoa a ser excluída
+    var url = request.url;
+    var id = parseInt(url.substring(url.lastIndexOf('/') + 1));
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    // Procura o índice da pessoa com o ID correspondente
+    var index = -1;
+    for (var i = 0; i < pessoas.length; i++) {
+      if (pessoas[i].id === id) {
+        index = i;
+        break;
+      }
+    }
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    if (index !== -1) {
+      // Remove a pessoa da lista
+      pessoas.splice(index, 1);
+      response.writeHead(200);
+      response.end();
+    } else {
+      // ID não encontrado, retorna erro 404
+      response.writeHead(404);
+      response.end();
+    }
+  } else {
+    // Responde com os dados das pessoas para outras requisições
+    response.writeHead(200, { 'Content-Type': 'application/json' });
+    response.write(JSON.stringify(pessoas));
+    response.end();
+  }
+});
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+server.listen(3000);
