@@ -1,5 +1,10 @@
 Projeto realizado com auxilio de React.Js.Utilizando axios juntamente com o aplicação web Replit para o uso da API desenvolvida.
 API:
+
+
+
+
+
 var pessoas = [
   { "id": 1, "nome": "Luiz", "email": "luiz@gmail.com" },
   { "id": 2, "nome": "Fernando", "email": "Fernando@gmail.com" },
